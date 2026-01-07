@@ -18,6 +18,7 @@ def test_chiffrement_dechiffrement_succes():
 
     # 3. VERIFICATION (Assert)
     assert message_recupere == secret_original
+    
 
 def test_chiffrement_mauvais_password():
     """Vérifie que le déchiffrement échoue avec un mauvais mot de passe."""
@@ -56,3 +57,37 @@ def test_ecriture_lecture_suppression_fichier():
     succes_suppression = manager.supprimer_fichier_binaire(nom_test)
     assert succes_suppression is True
     assert os.path.exists(chemin) is False
+
+# --- AJOUTS : TESTS DE SÉCURITÉ ---
+
+def test_securite_path_traversal():
+    """
+    Vérifie qu'on ne peut pas sortir du dossier passwords avec '..'
+    """
+    # Tentative d'écriture dans le dossier parent
+    nom_pirate = "../systeme_hack.crypt"
+    donnees = b"virus"
+
+    # Le manager DOIT refuser (renvoyer False)
+    succes = manager.ecrire_fichier_binaire(nom_pirate, donnees)
+    assert succes is False
+
+    # Double vérification : le fichier ne doit pas exister physiquement
+    assert os.path.exists(nom_pirate) is False
+
+def test_securite_injection_chemins():
+    """
+    Vérifie qu'on ne peut pas injecter des slashs ou backslashs
+    pour aller dans des sous-dossiers non prévus ou à la racine.
+    """
+    # Liste des noms interdits
+    noms_interdits = [
+        "dossier/fichier.crypt",   # Slash Linux/Mac
+        "dossier\\fichier.crypt",  # Backslash Windows
+        "/etc/passwd",           # Racine Linux
+        "C:\\Windows\\System32"  # Racine Windows
+    ]
+
+    for nom in noms_interdits:
+        succes = manager.ecrire_fichier_binaire(nom, b"test")
+        assert succes is False, f"La sécurité a échoué pour : {nom}"
