@@ -3,10 +3,9 @@ import pytest
 from security import crypto
 from file_io import manager
 
-# --- TESTS DU MODULE CRYPTO ---
+# --- TESTS DU MODULE CRYPTO : CAS DE RÉUSSITE ---
 
 def test_chiffrement_dechiffrement_succes():
-    """Vérifie qu'on récupère bien le message si le mot de passe est bon."""
     secret_original = "MonCodeSecret123"
     password = "MasterPassword"
 
@@ -19,9 +18,9 @@ def test_chiffrement_dechiffrement_succes():
     # 3. VERIFICATION (Assert)
     assert message_recupere == secret_original
     
+# --- TESTS DU MODULE CRYPTO : CAS D'ÉCHEC ---
 
 def test_chiffrement_mauvais_password():
-    """Vérifie que le déchiffrement échoue avec un mauvais mot de passe."""
     secret = "TopSecret"
     
     # On chiffre avec "Mdp1"
@@ -58,12 +57,9 @@ def test_ecriture_lecture_suppression_fichier():
     assert succes_suppression is True
     assert os.path.exists(chemin) is False
 
-# --- AJOUTS : TESTS DE SÉCURITÉ ---
+# --- AJOUTS : TESTS DE SÉCURITÉ POUR L'INJECTION DE CHEMINS ---
 
 def test_securite_path_traversal():
-    """
-    Vérifie qu'on ne peut pas sortir du dossier passwords avec '..'
-    """
     # Tentative d'écriture dans le dossier parent
     nom_pirate = "../systeme_hack.crypt"
     donnees = b"virus"
@@ -75,12 +71,9 @@ def test_securite_path_traversal():
     # Double vérification : le fichier ne doit pas exister physiquement
     assert os.path.exists(nom_pirate) is False
 
+# --- AJOUTS : TESTS DE SÉCURITÉ POUR L'INJECTION DE CHEMINS ---
+
 def test_securite_injection_chemins():
-    """
-    Vérifie qu'on ne peut pas injecter des slashs ou backslashs
-    pour aller dans des sous-dossiers non prévus ou à la racine.
-    """
-    # Liste des noms interdits
     noms_interdits = [
         "dossier/fichier.crypt",   # Slash Linux/Mac
         "dossier\\fichier.crypt",  # Backslash Windows

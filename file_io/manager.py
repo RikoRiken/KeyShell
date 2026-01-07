@@ -1,17 +1,16 @@
+# --- Lecture, Ecriture, Suppression de fichiers dans le coffre --- 
 import os
 
 DOSSIER_DATA = "passwords"
 
+# Initialise le dossier de stockage des fichiers s'il n'existe pas
 def init_dossier():
-    """Crée le dossier de stockage s'il n'existe pas."""
     if not os.path.exists(DOSSIER_DATA):
         os.makedirs(DOSSIER_DATA)
 
+# Vérifie la sécurité du nom de fichier /!\ suite à la vulnérabilité Path Traversal /!\
 def verifier_securite_nom(nom_fichier: str) -> bool:
-    """
-    Vérifie que le nom de fichier ne contient pas de tentative d'intrusion.
-    Empêche les '..' (Path Traversal) et les séparateurs de dossiers.
-    """
+
     if not nom_fichier or nom_fichier.strip() == "":
         return False
         
@@ -22,15 +21,16 @@ def verifier_securite_nom(nom_fichier: str) -> bool:
         
     return True
 
+# Obtient le chemin complet d'un fichier dans le dossier passwords/
 def obtenir_chemin(nom_fichier: str) -> str:
     return os.path.join(DOSSIER_DATA, nom_fichier)
 
+# Lit un fichier binaire depuis le dossier passwords/
 def lire_fichier_binaire(nom_fichier: str):
 
     if not verifier_securite_nom(nom_fichier):
         return False
     
-    """Lit un fichier dans le dossier passwords/"""
     chemin = obtenir_chemin(nom_fichier)
     if not os.path.exists(chemin):
         return None
@@ -41,13 +41,12 @@ def lire_fichier_binaire(nom_fichier: str):
         print(f"Erreur lecture : {e}")
         return None
 
+# Écrit un fichier binaire dans le dossier passwords/
 def ecrire_fichier_binaire(nom_fichier: str, donnees: bytes):
 
     if not verifier_securite_nom(nom_fichier):
         return False
     
-
-    """Écrit un fichier dans le dossier passwords/"""
     init_dossier() # On s'assure que le dossier existe
     chemin = obtenir_chemin(nom_fichier)
     try:
@@ -57,7 +56,8 @@ def ecrire_fichier_binaire(nom_fichier: str, donnees: bytes):
     except Exception as e:
         print(f"Erreur écriture : {e}")
         return False
-    
+
+# Supprime un fichier binaire du dossier passwords/
 def supprimer_fichier_binaire(nom_fichier: str) -> bool:
 
     if not verifier_securite_nom(nom_fichier):
@@ -75,8 +75,8 @@ def supprimer_fichier_binaire(nom_fichier: str) -> bool:
             return False
     return False
 
+# Liste tous les fichiers dans le dossier passwords/
 def lister_fichiers():
-    """Liste tous les services enregistrés."""
     if not os.path.exists(DOSSIER_DATA):
         return []
     return [f for f in os.listdir(DOSSIER_DATA) if f.endswith('.crypt') and f != 'auth.crypt']

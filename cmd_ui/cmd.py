@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+
+# --- Interface Utilisateur en Ligne de Commande pour l'application ---
+
 import sys
 from rich.console import Console
 from rich.panel import Panel
@@ -13,6 +16,7 @@ from authentication import auth
 console = Console()
 MASTER_PASSWORD = None
 
+# Afficher le header du système
 def afficher_header():
     console.clear()
     console.print(Panel.fit(
@@ -20,6 +24,7 @@ def afficher_header():
         border_style="red"
     ))
 
+# Afficher l'aide des commandes disponibles
 def afficher_aide():
     table = Table(title="\nCommandes du Système", box=box.ROUNDED)
 
@@ -35,12 +40,13 @@ def afficher_aide():
     
     console.print(table)
 
+# Gestion de la connexion au système
 def login_systeme():
     global MASTER_PASSWORD
     afficher_header()
     manager.init_dossier()
 
-    # CAS 1 : Premier lancement (Installation)
+    # 1. Premier lancement (Installation)
     if not auth.est_inscrit():
         console.print(Panel("[bold yellow]INITIALISATION DU SYSTÈME[/bold yellow]\nVeuillez définir le mot de passe ROOT.", border_style="yellow"))
         
@@ -58,7 +64,7 @@ def login_systeme():
             else:
                 console.print("[red]Les mots de passe ne correspondent pas.[/red]")
 
-    # CAS 2 : Connexion normale
+    # 2. Connexion normale
     else:
         console.print("\n[red]🔒 ACCÈS RESTREINT : ROOT SEULEMENT[/red]")
         tentatives = 3
@@ -75,8 +81,8 @@ def login_systeme():
         if not MASTER_PASSWORD:
             sys.exit(1)
 
+# Sélectionner un service dans la liste
 def selectionner_service(action: str):
-    """Affiche une liste et renvoie le nom du service choisi."""
     fichiers = manager.lister_fichiers()
     services = [f.replace('.crypt', '') for f in fichiers]
 
@@ -100,7 +106,7 @@ def selectionner_service(action: str):
     if choix.isdigit():
         index = int(choix) - 1
         if 0 <= index < len(services):
-            return services[index] # On renvoie le nom correspondant au numéro
+            return services[index]
         else:
             console.print("[red]Numéro invalide.[/red]")
             return None
@@ -112,6 +118,7 @@ def selectionner_service(action: str):
             console.print(f"[red]Le service '{choix}' n'existe pas.[/red]")
             return None
 
+# Ajouter un mot de passe sécurisé dans le coffre
 def add():
     service = Prompt.ask("Nom du service")
     nom_fichier = f"{service.lower().strip()}.crypt"
@@ -122,6 +129,7 @@ def add():
     if manager.ecrire_fichier_binaire(nom_fichier, donnees):
         console.print(f"[green]✔ Mot de passe pour {service} sécurisé.[/green]")
 
+# Récupérer et déchiffrer un mot de passe sécurisé
 def get():
     service = selectionner_service(action="lire")
     if not service:
@@ -130,20 +138,19 @@ def get():
     nom_fichier = f"{service.lower().strip()}.crypt"
     donnees = manager.lire_fichier_binaire(nom_fichier)
 
-    # 2. DOUBLE VÉRIFICATION DE SÉCURITÉ
     check_pwd = Prompt.ask(f"[orange3]\n🔒 Sécurité : Confirmez votre mot de passe pour voir[/] [bold orange3]'{service}'[/]", password=True)
 
     if check_pwd != MASTER_PASSWORD:
         console.print("[bold red]❌ Mot de passe incorrect. Accès refusé.[/bold red]")
         return
 
-    # 3. Si c'est bon, on déchiffre
     mdp = crypto.dechiffrer_message(donnees, MASTER_PASSWORD)
     if mdp:
         console.print(Panel(f"PASSWORD : [bold cyan]{mdp}[/bold cyan]", title=service, border_style="green"))
     else:
         console.print("[red]Erreur de déchiffrement (Fichier corrompu ?).[/red]")
 
+# Supprimer un mot de passe sécurisé du coffre
 def delete():
     service = selectionner_service(action="lire")
     if not service:
@@ -168,6 +175,7 @@ def delete():
     else:
         console.print("[italic]Suppression annulée.[/italic]")
 
+# Lister tous les services dans le coffre
 def list():
     fichiers = manager.lister_fichiers()
     clean_names = [f.replace('.crypt', '') for f in fichiers]

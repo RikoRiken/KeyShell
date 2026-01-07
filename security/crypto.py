@@ -1,8 +1,10 @@
+# --- Chiffrement et Déchiffrement des messages ---
 import os
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 
+# Dérive une clé à partir d'un mot de passe et d'un sel
 def deriver_cle(password: str, sel: bytes = None):
     if sel is None:
         sel = os.urandom(16)
@@ -17,6 +19,7 @@ def deriver_cle(password: str, sel: bytes = None):
     
     return cle, sel
 
+# Chiffre un message avec le mot de passe donné
 def chiffrer_message(message_clair: str, password: str):
     cle, sel = deriver_cle(password, sel=None)
     aesgcm = AESGCM(cle)
@@ -27,6 +30,7 @@ def chiffrer_message(message_clair: str, password: str):
     
     return donnees_chiffrees
 
+# Déchiffre un message avec le mot de passe donné
 def dechiffrer_message(donnees_chiffrees: bytes, password: str):
     try:
         sel = donnees_chiffrees[:16]
