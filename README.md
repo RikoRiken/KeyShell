@@ -94,9 +94,14 @@ The tool prompts for details and automatically enforces password policies before
 
 <img src="/cmd_ui/assets/KeyShell_add-get.png">
 
-
 3. 🛡️ Security in Action: Vuln. Detected
 
 KeyShell actively monitors for malicious inputs. Here, a Path Traversal attack (../hack) is detected and blocked instantly.
 
 <img src="/cmd_ui/assets/KeyShell_path-traversal.png">
+
+4. Locally encrypted password storage
+
+The tool store password added in a `password/` folder as a file with a .crypt extension. Theses files can only be decrypted with Master Password of @Root user
+
+<img src="/cmd_ui/assets/KeyShell_password-crypt.png">
