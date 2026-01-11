@@ -78,7 +78,7 @@ python3 main.py
 
 ## Demonstration
 
-1. Secure authentication (Root Access)
+**1. Secure authentication (Root Access)**
 
 Upon launch, the user is greeted by the secure banner and must authenticate to decrypt the vault.
 
@@ -88,19 +88,19 @@ Command *(On Linux)* = `python3 main.py`
 
 <img src="/cmd_ui/assets/KeyShell_login.png">
 
-2. Adding and Getting secrets (Interactive Mode)
+**2. Adding and Getting secrets (Interactive Mode)**
 
 The tool prompts for details and automatically enforces password policies before encrypting the data.
 
 <img src="/cmd_ui/assets/KeyShell_add-get.png">
 
-3. 🛡️ Security in Action: Vuln. Detected
+**3. 🛡️ Security in Action: Vuln. Detected**
 
 KeyShell actively monitors for malicious inputs. Here, a Path Traversal attack (../hack) is detected and blocked instantly.
 
 <img src="/cmd_ui/assets/KeyShell_path-traversal.png">
 
-4. Locally encrypted password storage
+**4. Locally encrypted password storage**
 
 The tool store password added in a `password/` folder as a file with a .crypt extension. Theses files can only be decrypted with Master Password of @Root user
 
